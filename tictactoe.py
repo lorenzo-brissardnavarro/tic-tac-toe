@@ -38,7 +38,23 @@ def changement_joueur(joueur):
         return "O"
     else:
         return "X"
-        
+
+def saisie_coordonnees(grille):
+    saisie_valide = False
+    while saisie_valide == False:
+        try:
+            horizontal = int(input("Entrez le numéro horizontal : ")) - 1
+            vertical = int(input("Entrez le numéro vertical : ")) - 1
+            if 0 <= horizontal < 3 and 0 <= vertical < 3:
+                if grille[horizontal][vertical] == '-':
+                    saisie_valide = True
+                else:
+                    print("\033[1;31mCase déjà occupée\033[0m")
+            else:
+                print("\033[1;31mCoordonnées hors grille\033[0m")
+        except ValueError:
+                print("\033[1;31mVeuillez entrer un nombre valide\033[0m")
+    return horizontal, vertical
 
 def fonctionnement():
     grille_morpion = creation_grille()
@@ -46,11 +62,7 @@ def fonctionnement():
     while victoire(grille_morpion) != True and est_remplie(grille_morpion) == False:
         print(f"\033[1;34mAu tour de {joueur} de jouer !\033[0m")
         affichage(grille_morpion)
-        horizontal = int(input("Entrez le numéro horizontal : "))-1
-        vertical = int(input("Entrez le numéro vertical : "))-1
-        while grille_morpion[horizontal][vertical] != '-':
-            horizontal = int(input("Entrez le numéro horizontal : "))-1
-            vertical = int(input("Entrez le numéro vertical : "))-1
+        horizontal, vertical = saisie_coordonnees(grille_morpion)
         grille_morpion[horizontal][vertical] = joueur
         if victoire(grille_morpion):
             print(f"\033[1;32mVictoire du joueur {joueur}\033[0m")
