@@ -21,13 +21,13 @@ def est_remplie(grille):
 
 def victoire(grille, joueur):
     for k in range(3):
-        if grille[k][0] == joueur and grille[k][0] == grille[k][1] == grille[k][2]:
+        if grille[k][0] == grille[k][1] == grille[k][2] == joueur:
             return True
-        if grille[0][k] == joueur and grille[0][k] == grille[1][k] == grille[2][k]:
+        if  grille[0][k] == grille[1][k] == grille[2][k] == joueur:
             return True
-    if grille[0][0] == joueur and grille[0][0] == grille[1][1] == grille[2][2]:
+    if grille[0][0] == grille[1][1] == grille[2][2] == joueur:
         return True
-    if grille[0][2] == joueur and grille[0][2] == grille[1][1] == grille[2][0]:
+    if grille[0][2] == grille[1][1] == grille[2][0] == joueur:
         return True
     return False
 
@@ -54,39 +54,26 @@ def saisie_coordonnees(grille):
                 print("\033[1;31mVeuillez entrer un nombre valide\033[0m")
     return horizontal, vertical
 
-def test_victoire_ordi(grille):
+def coup_gagnant(grille, symbole):
     for i in range(3):
         for j in range(3):
             if grille[i][j] == "-":
-                grille[i][j] = "O"
-                if victoire(grille, "O") == False:
-                    grille[i][j] = "-"
-                else:
-                    return grille, True
-    return grille, False
-
-def test_victoire_joueur(grille):
-    for i in range(3):
-        for j in range(3):
-            if grille[i][j] == "-":
-                grille[i][j] = "X"
-                if victoire(grille, "X") == False:
-                    grille[i][j] = "-"
-                else:
+                grille[i][j] = symbole
+                if victoire(grille, symbole):
                     grille[i][j] = "O"
                     return grille, True
+                grille[i][j] = "-"
     return grille, False
 
 def positionnement_ordi(grille):
-    est_place = False
-    while est_place == False:
-        h = random.randint(0, 2)
-        v = random.randint(0, 2)
-        if grille[h][v] == "-":
-            grille[h][v] = "O"
-            est_place = True
-            return grille
-    return
+    cases_vides = []
+    for i in range(3):
+        for j in range(3):
+            if grille[i][j] == "-":
+                cases_vides.append((i, j))
+    h, v = random.choice(cases_vides)
+    grille[h][v] = "O"
+    return grille
 
 def tour_joueur(grille, joueur):
     print(f"\033[1;34mA votre tour de jouer\033[0m")
@@ -98,16 +85,13 @@ def tour_joueur(grille, joueur):
 def tour_ordi(grille):
     print(f"\033[1;34mAu tour de l'ordinateur de jouer\033[0m")
     affichage(grille)
-    nouvelle_grille, est_place = test_victoire_joueur(grille)
-    if est_place == False:
-        nouvelle_grille, est_place = test_victoire_ordi(grille)
-        if est_place == True:
-            return nouvelle_grille
-        else:
-            nouvelle_grille = positionnement_ordi(grille)
-            return nouvelle_grille
-    else:
+    nouvelle_grille, bloque = coup_gagnant(grille, "X")
+    if bloque:
         return nouvelle_grille
+    nouvelle_grille, gagne = coup_gagnant(grille, "O")
+    if gagne:
+        return nouvelle_grille
+    return positionnement_ordi(grille)
 
 
 def fonctionnement():
