@@ -74,7 +74,7 @@ def fonctionnement():
             return
         joueur = changement_joueur(joueur)
 
-fonctionnement()
+#fonctionnement()
         
         
 

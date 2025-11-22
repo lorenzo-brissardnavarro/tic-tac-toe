@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 import pygame_gui
+from tictactoe import *
 
 pygame.init()
 
@@ -79,7 +80,7 @@ def page_choix():
 
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == bouton_mode1:
-                    print("Mode 1 sélectionné")
+                    page_jeu()
                 elif event.ui_element == bouton_mode2:
                     print("Mode 2 sélectionné")
 
@@ -94,6 +95,78 @@ def page_choix():
         fenetre.blit(image_mode2, (315, 150))
 
         pygame.display.flip()
+
+def page_jeu():
+    manager.clear_and_reset()
+    case = (dimension - 60) // 3
+    marge = 30 
+
+    img_X = pygame.image.load("img_X.png").convert_alpha()
+    img_O = pygame.image.load("img_O.png").convert_alpha()
+    img_X = pygame.transform.scale(img_X, (case, case))
+    img_O = pygame.transform.scale(img_O, (case, case))
+
+    info = pygame_gui.elements.UILabel(relative_rect=pygame.Rect(0, 0, dimension, 30),text=" Au tour de X",manager=manager)
+
+    grille = creation_grille()
+    joueur = "X"
+
+    boutons = []
+    for i in range(3):
+        for j in range(3):
+            btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(marge + j * case,30 + marge + i * case,case,case),text="",manager=manager)
+            boutons.append(btn)
+
+    en_cours = True
+    clock = pygame.time.Clock()
+
+    while en_cours:
+        time_delta = clock.tick(60)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                en_cours = False
+
+            if event.type == pygame_gui.UI_BUTTON_PRESSED:
+                if event.ui_element in boutons:
+                    index = boutons.index(event.ui_element)
+                    lig = index // 3
+                    col = index % 3
+
+                    if grille[lig][col] != "-":
+                        continue
+
+                    grille[lig][col] = joueur
+
+                    if victoire(grille):
+                        info.set_text(f" Victoire de {joueur} !")
+                        en_cours = False
+                        break
+
+                    if est_remplie(grille):
+                        info.set_text(" Match nul")
+                        en_cours = False
+                        break
+
+                    joueur = changement_joueur(joueur)
+                    info.set_text(f" Au tour de {joueur}")
+
+            manager.process_events(event)
+
+        manager.update(time_delta)
+        fenetre.fill((0, 0, 0))
+        manager.draw_ui(fenetre)
+
+        for i in range(3):
+            for j in range(3):
+                if grille[i][j] == "X":
+                    fenetre.blit(img_X, (marge + j * case, 30 + marge + i * case))
+                elif grille[i][j] == "O":
+                    fenetre.blit(img_O, (marge + j * case, 30 + marge + i * case))
+
+        pygame.display.update()
+
+    pygame.time.wait(3000)
 
 page_accueil()
 pygame.quit()
