@@ -1,18 +1,32 @@
- {
-     "button":
-     {
-         "colours":
-         {
-             "normal_border": "White",
-             "normal_bg": "SlateGray",
-             "normal_text": "White"
-         },
-         "misc":
-         {
-             "shape": "rounded_rectangle",
-             "shape_corner_radius": "10",
-             "border_width": "2"
-         }
-     }
- }
- 
+{
+    "button": {
+      "font": {
+        "name": "audiowide_button",
+        "size": 30,
+        "regular_path": "Audiowide-Regular.ttf"
+      },
+      "colours": {
+        "normal_bg": "#000035",
+        "hovered_bg": "#007ED3",
+        "normal_border": "#00E5FF",
+        "hovered_border": "#000035",
+        "normal_text": "#00E5FF",
+        "hovered_text": "#000035"
+      },
+      "misc": {
+        "shape": "rounded_rectangle",
+        "border_width": 3,
+        "shape_corner_radius": 8
+      }
+    },
+    "label": {
+      "font": {
+        "name": "audiowide_title",
+        "size": 70,
+        "regular_path": "Audiowide-Regular.ttf"
+      },
+      "colours": {
+        "normal_text": "#00E5FF"
+      }
+    }
+}
