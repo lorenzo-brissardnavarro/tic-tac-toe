@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 import pygame_gui
-from tictactoe import *
+from fonctions import *
 
 pygame.init()
 
@@ -11,7 +11,13 @@ pygame.display.set_caption("Tic Tac Toe")
 
 manager = pygame_gui.UIManager((dimension, dimension),theme_path="quick_start.json")
 
+en_jeu = True
+def quitter_application():
+    global en_jeu
+    en_jeu = False
+
 def page_accueil():
+    global en_jeu
     manager.clear_and_reset()
     fond = pygame.image.load("background_morpion.png").convert()
     fond = pygame.transform.scale(fond, (dimension, dimension))
@@ -25,18 +31,18 @@ def page_accueil():
     play_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((dimension/2)-125, dimension-120, 250, 80),text="JOUER",manager=manager)
 
     clock = pygame.time.Clock()
-    continuer = True
 
-    while continuer:
+    while en_jeu:
         time_delta = clock.tick(60) / 1000.0
 
         for event in pygame.event.get():
             if event.type == QUIT:
-                continuer = False
+                quitter_application()
+                return
 
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == play_button:
-                    page_choix()
+                    continuer = page_choix()
 
             manager.process_events(event)
 
@@ -51,9 +57,11 @@ def page_accueil():
         fenetre.blit(play_icon, (icon_x, icon_y))
 
         pygame.display.flip()
+    return True
 
 
 def page_choix():
+    global en_jeu
     manager.clear_and_reset()
     fenetre.fill((0, 0, 0))
 
@@ -65,24 +73,24 @@ def page_choix():
     image_mode1 = pygame.transform.scale(image_mode1, (250, 350))
     image_mode2 = pygame.transform.scale(image_mode2, (250, 350))
 
-    bouton_mode1 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(35, 150, 250, 350),text="",manager=manager, object_id="#bouton_mode1")
-    bouton_mode2 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(315, 150, 250, 350),text="",manager=manager, object_id="#bouton_mode2")
+    bouton_mode1 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(35, 150, 250, 350),text="",manager=manager)
+    bouton_mode2 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(315, 150, 250, 350),text="",manager=manager)
 
     clock = pygame.time.Clock()
-    continuer = True
 
-    while continuer:
+    while en_jeu:
         time_delta = clock.tick(60)/1000.0
 
         for event in pygame.event.get():
             if event.type == QUIT:
-                continuer = False
+                quitter_application()
+                return
 
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == bouton_mode1:
-                    page_jeu()
+                    page_jeu("jcj")
                 elif event.ui_element == bouton_mode2:
-                    print("Mode 2 sélectionné")
+                    page_jeu("ia")
 
             manager.process_events(event)
 
@@ -96,7 +104,8 @@ def page_choix():
 
         pygame.display.flip()
 
-def page_jeu():
+def page_jeu(mode):
+    global en_jeu
     manager.clear_and_reset()
     case = (dimension - 60) // 3
     marge = 30 
@@ -110,6 +119,7 @@ def page_jeu():
 
     grille = creation_grille()
     joueur = "X"
+    partie_finie = False
 
     boutons = []
     for i in range(3):
@@ -117,17 +127,17 @@ def page_jeu():
             btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(marge + j * case,30 + marge + i * case,case,case),text="",manager=manager)
             boutons.append(btn)
 
-    en_cours = True
     clock = pygame.time.Clock()
 
-    while en_cours:
+    while en_jeu:
         time_delta = clock.tick(60)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                en_cours = False
+                quitter_application()
+                return
 
-            if event.type == pygame_gui.UI_BUTTON_PRESSED:
+            if event.type == pygame_gui.UI_BUTTON_PRESSED and not partie_finie:
                 if event.ui_element in boutons:
                     index = boutons.index(event.ui_element)
                     lig = index // 3
@@ -138,20 +148,34 @@ def page_jeu():
 
                     grille[lig][col] = joueur
 
-                    if victoire(grille):
+                    if victoire(grille, joueur):
                         info.set_text(f" Victoire de {joueur} !")
-                        en_cours = False
+                        partie_finie = True
                         break
 
                     if est_remplie(grille):
                         info.set_text(" Match nul")
-                        en_cours = False
+                        partie_finie = True
                         break
 
                     joueur = changement_joueur(joueur)
                     info.set_text(f" Au tour de {joueur}")
 
             manager.process_events(event)
+
+        if mode == "ia" and joueur == "O" and en_jeu and not partie_finie:
+            grille = tour_ordi(grille)
+
+            if victoire(grille, "O"):
+                info.set_text(" Victoire de l'IA !")
+                partie_finie = True
+            elif est_remplie(grille):
+                info.set_text(" Match nul")
+                partie_finie = True
+                break
+            else:
+                joueur = "X"
+                info.set_text(" Au tour de X")
 
         manager.update(time_delta)
         fenetre.fill((0, 0, 0))
@@ -166,7 +190,13 @@ def page_jeu():
 
         pygame.display.update()
 
-    pygame.time.wait(3000)
+def main():
+    global en_jeu
 
-page_accueil()
-pygame.quit()
+    while en_jeu:
+        page_accueil()
+
+    pygame.quit()
+    exit()
+
+main()
