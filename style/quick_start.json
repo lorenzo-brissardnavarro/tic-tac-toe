@@ -1,9 +1,9 @@
 {
     "button": {
       "font": {
-        "name": "audiowide_button",
+        "name": "audiowide_button_30",
         "size": 30,
-        "regular_path": "Audiowide-Regular.ttf"
+        "regular_path": "font/Audiowide-Regular.ttf"
       },
       "colours": {
         "normal_bg": "#000035",
@@ -19,11 +19,12 @@
         "shape_corner_radius": 8
       }
     },
+
     "label": {
       "font": {
-        "name": "audiowide_title",
-        "size": 70,
-        "regular_path": "Audiowide-Regular.ttf"
+        "name": "audiowide_title_72",
+        "size": 72,
+        "regular_path": "font/Audiowide-Regular.ttf"
       },
       "colours": {
         "normal_text": "#00E5FF"

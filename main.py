@@ -1,7 +1,8 @@
 import pygame
 from pygame.locals import *
 import pygame_gui
-from fonctions import *
+from code.fonctions import *
+
 
 pygame.init()
 
@@ -9,7 +10,7 @@ dimension = 600
 fenetre = pygame.display.set_mode((dimension, dimension))
 pygame.display.set_caption("Tic Tac Toe")
 
-manager = pygame_gui.UIManager((dimension, dimension),theme_path="quick_start.json")
+manager = pygame_gui.UIManager((dimension, dimension),theme_path="style/quick_start.json")
 
 en_jeu = True
 def quitter_application():
@@ -19,10 +20,10 @@ def quitter_application():
 def page_accueil():
     global en_jeu
     manager.clear_and_reset()
-    fond = pygame.image.load("background_morpion.png").convert()
+    fond = pygame.image.load("images/background_morpion.png").convert()
     fond = pygame.transform.scale(fond, (dimension, dimension))
 
-    play_icon = pygame.image.load("play_icon.png").convert_alpha()
+    play_icon = pygame.image.load("images/play_icon.png").convert_alpha()
     play_icon = pygame.transform.scale(play_icon, (60, 60))
 
     titre = pygame_gui.elements.UILabel(relative_rect=pygame.Rect(0, 40, dimension, 70),text="Jeu du Tic Tac Toe",manager=manager)
@@ -67,8 +68,8 @@ def page_choix():
 
     label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect(0, 40, 600, 50), text="Choisissez votre mode de jeu", manager=manager)
 
-    image_mode1 = pygame.image.load("joueur_vs_joueur.png").convert_alpha()
-    image_mode2 = pygame.image.load("joueur_vs_ia.png").convert_alpha()
+    image_mode1 = pygame.image.load("images/joueur_vs_joueur.png").convert_alpha()
+    image_mode2 = pygame.image.load("images/joueur_vs_ia.png").convert_alpha()
 
     image_mode1 = pygame.transform.scale(image_mode1, (250, 350))
     image_mode2 = pygame.transform.scale(image_mode2, (250, 350))
@@ -110,16 +111,20 @@ def page_jeu(mode):
     case = (dimension - 60) // 3
     marge = 30 
 
-    img_X = pygame.image.load("img_X.png").convert_alpha()
-    img_O = pygame.image.load("img_O.png").convert_alpha()
+    img_X = pygame.image.load("images/img_X.png").convert_alpha()
+    img_O = pygame.image.load("images/img_O.png").convert_alpha()
     img_X = pygame.transform.scale(img_X, (case, case))
     img_O = pygame.transform.scale(img_O, (case, case))
+
+    victoire_x = pygame.image.load("images/VICTOIRE_DE_X.png").convert_alpha()
+    victoire_o = pygame.image.load("images/VICTOIRE_DE_O.png").convert_alpha()
 
     info = pygame_gui.elements.UILabel(relative_rect=pygame.Rect(0, 0, dimension, 30),text=" Au tour de X",manager=manager)
 
     grille = creation_grille()
     joueur = "X"
     partie_finie = False
+    image_fin = None
 
     boutons = []
     for i in range(3):
@@ -150,6 +155,10 @@ def page_jeu(mode):
 
                     if victoire(grille, joueur):
                         info.set_text(f" Victoire de {joueur} !")
+                        if joueur == "X":
+                            image_fin = victoire_x
+                        else:
+                            image_fin = victoire_o
                         partie_finie = True
                         break
 
@@ -168,6 +177,7 @@ def page_jeu(mode):
 
             if victoire(grille, "O"):
                 info.set_text(" Victoire de l'IA !")
+                image_fin = victoire_o
                 partie_finie = True
             elif est_remplie(grille):
                 info.set_text(" Match nul")
@@ -187,6 +197,13 @@ def page_jeu(mode):
                     fenetre.blit(img_X, (marge + j * case, 30 + marge + i * case))
                 elif grille[i][j] == "O":
                     fenetre.blit(img_O, (marge + j * case, 30 + marge + i * case))
+
+        if image_fin:
+            overlay = pygame.Surface((dimension, dimension))
+            overlay.set_alpha(150)
+            overlay.fill((0, 0, 0))
+            fenetre.blit(overlay, (0, 0)) 
+            fenetre.blit(image_fin, (0, 0))
 
         pygame.display.update()
 
